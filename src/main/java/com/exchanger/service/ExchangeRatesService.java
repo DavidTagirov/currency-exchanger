@@ -26,12 +26,32 @@ public class ExchangeRatesService {
         return exchangeRate.orElseThrow(ExchangeRateNotFoundException::new);
     }
 
-    public void setExchangeRate(ExchangeRateDto exchangeRateDto) {
+    public ExchangeRate setExchangeRate(ExchangeRateDto exchangeRateDto) {
         if (exchangeRateDto.baseCurrencyCode() == null || exchangeRateDto.baseCurrencyCode().isBlank() ||
                 exchangeRateDto.targetCurrencyCode() == null || exchangeRateDto.targetCurrencyCode().isBlank() ||
                 exchangeRateDto.rate() == null) {
             throw new MissingRequestParameterException();
         }
         exchangeRatesDao.save(exchangeRateDto);
+        Optional<ExchangeRate> exchangeRate = exchangeRatesDao.findByCodes(
+                exchangeRateDto.baseCurrencyCode(),
+                exchangeRateDto.targetCurrencyCode()
+        );
+        return exchangeRate.orElseThrow(ExchangeRateNotFoundException::new);
+    }
+
+    public ExchangeRate uploadExchangeRate(ExchangeRateDto exchangeRateDto) {
+        if (exchangeRateDto.baseCurrencyCode() == null || exchangeRateDto.baseCurrencyCode().isBlank() ||
+                exchangeRateDto.targetCurrencyCode() == null || exchangeRateDto.targetCurrencyCode().isBlank() ||
+                exchangeRateDto.rate() == null) {
+            throw new MissingRequestParameterException();
+        }
+        exchangeRatesDao.updateExchangeRate(exchangeRateDto);
+        Optional<ExchangeRate> exchangeRate = exchangeRatesDao.findByCodes(
+                exchangeRateDto.baseCurrencyCode(),
+                exchangeRateDto.targetCurrencyCode()
+        );
+        return exchangeRate.orElseThrow(ExchangeRateNotFoundException::new);
+
     }
 }

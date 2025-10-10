@@ -25,12 +25,14 @@ public class CurrenciesService {
         return currency.orElseThrow(CurrencyNotFoundException::new);
     }
 
-    public void setCurrency(CurrencyDto currencyDto) {
+    public Currency setCurrency(CurrencyDto currencyDto) {
         if (currencyDto.code() == null || currencyDto.code().length() != 3 ||
                 currencyDto.fullName() == null || currencyDto.fullName().isBlank() ||
                 currencyDto.sign() == null || currencyDto.sign().isBlank()) {
             throw new MissingRequestParameterException();
         }
         currenciesDao.save(currencyDto);
+        Optional<Currency> currency = currenciesDao.findByCode(currencyDto.code());
+        return currency.orElseThrow(CurrencyNotFoundException::new);
     }
 }

@@ -18,6 +18,9 @@ public class CurrenciesDao {
                      """)) {
             preparedStatement.setString(1, code);
             ResultSet resultSet = preparedStatement.executeQuery();
+            if(!resultSet.next()){
+                return Optional.empty();
+            }
             return Optional.of(CurrencyMapper.map(resultSet));
         } catch (SQLException e) {
             throw new RuntimeException("Не удалось найти валюту" + e);

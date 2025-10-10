@@ -37,6 +37,9 @@ public class ExceptionHandler {
         } else if (e instanceof CurrencyNotExistsException) {
             status = HttpServletResponse.SC_NOT_FOUND;
             message = "Одна (или обе) валюта из валютной пары не существует в БД";
+        } else if (e instanceof CurrencyPairNotExistsException) {
+            status = HttpServletResponse.SC_NOT_FOUND;
+            message = "Валютная пара отсутствует в базе данных";
         } else {
             status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         }

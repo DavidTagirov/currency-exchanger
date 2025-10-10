@@ -42,8 +42,8 @@ public class CurrenciesServlet extends HttpServlet {
             String fullName = request.getParameter("fullName");
             String sign = request.getParameter("sign");
             CurrencyDto currencyDto = new CurrencyDto(code, fullName, sign);
-            currenciesService.setCurrency(currencyDto);
-            response.getWriter().write(new Gson().toJson(currencyDto));
+            Currency currency = currenciesService.setCurrency(currencyDto);
+            response.getWriter().write(new Gson().toJson(currency));
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (Exception e) {
             ExceptionHandler.handle(e, response);

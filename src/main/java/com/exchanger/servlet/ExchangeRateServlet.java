@@ -1,5 +1,6 @@
 package com.exchanger.servlet;
 
+import com.exchanger.dto.ExchangeRateDto;
 import com.exchanger.exception.ExceptionHandler;
 import com.exchanger.model.ExchangeRate;
 import com.exchanger.service.ExchangeRatesService;
@@ -14,6 +15,7 @@ import java.io.IOException;
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
     private ExchangeRatesService exchangeRatesService;
+
     @Override
     public void init() {
         exchangeRatesService = new ExchangeRatesService();
@@ -27,7 +29,22 @@ public class ExchangeRateServlet extends HttpServlet {
             ExchangeRate exchangeRate = exchangeRatesService.getExchangeRate(baseCurrencyCode, targetCurrencyCode);
             response.getWriter().write(new Gson().toJson(exchangeRate));
             response.setStatus(HttpServletResponse.SC_OK);
-        } catch (Exception e){
+        } catch (Exception e) {
+            ExceptionHandler.handle(e, response);
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            String baseCurrencyCode = request.getPathInfo().substring(0, 3);
+            String targetCurrencyCode = request.getPathInfo().substring(3);
+            Double rate = Double.valueOf(request.getParameter("rate"));
+            ExchangeRateDto exchangeRateDto = new ExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
+            ExchangeRate exchangeRate = exchangeRatesService.uploadExchangeRate(exchangeRateDto);
+            response.getWriter().write(new Gson().toJson(exchangeRate));
+            response.setStatus(HttpServletResponse.SC_OK);
+        } catch (Exception e) {
             ExceptionHandler.handle(e, response);
         }
     }

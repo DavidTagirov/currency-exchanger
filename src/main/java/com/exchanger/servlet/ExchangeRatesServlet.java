@@ -41,8 +41,8 @@ public class ExchangeRatesServlet extends HttpServlet {
             String targetCurrencyCode = request.getParameter("targetCurrencyCode");
             Double rate = Double.parseDouble(request.getParameter("rate"));
             ExchangeRateDto exchangeRateDto = new ExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
-            exchangeRatesService.setExchangeRate(exchangeRateDto);
-            response.getWriter().write(new Gson().toJson(exchangeRateDto));
+            ExchangeRate exchangeRate = exchangeRatesService.setExchangeRate(exchangeRateDto);
+            response.getWriter().write(new Gson().toJson(exchangeRate));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e){
             ExceptionHandler.handle(e, response);
