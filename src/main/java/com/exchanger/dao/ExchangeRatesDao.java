@@ -47,6 +47,12 @@ public class ExchangeRatesDao {
             AND targetCurrencyId = (SELECT id FROM Currencies WHERE code = ?)
             """;
 
+    private static final String FIND_RATE_SQL = """
+            SELECT rate FROM ExchangeRates
+            WHERE baseCurrencyId = (SELECT id FROM Currencies WHERE code = ?)
+            AND targetCurrencyId = (SELECT id FROM Currencies WHERE code = ?)
+            """;
+
     public List<ExchangeRate> findAll() {
         List<ExchangeRate> exchangeRates = new ArrayList<>();
         try (Connection connection = DatabaseManager.getConnection();
@@ -106,6 +112,21 @@ public class ExchangeRatesDao {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Не удалось обновить обменный курс" + e);
+        }
+    }
+
+    public double findRate(String baseCurrencyCode, String targetCurrencyCode) {
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_RATE_SQL)) {
+            preparedStatement.setString(1, baseCurrencyCode);
+            preparedStatement.setString(2, targetCurrencyCode);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (!resultSet.next()) {
+                throw new CurrencyPairNotExistsException();
+            }
+            return resultSet.getDouble(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Не удалось получить ставку обменного курса" + e);
         }
     }
 }

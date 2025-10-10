@@ -9,5 +9,5 @@ VALUES ('USD', 'United States Dollar', '$'),
        ('KZT', 'Tenge', '₸');
 
 INSERT OR IGNORE INTO ExchangeRates(baseCurrencyId, targetCurrencyId, rate)
-VALUES (1, 2, 81.93),
+VALUES (1, 2, 80),
        (2, 1, 0.012205);

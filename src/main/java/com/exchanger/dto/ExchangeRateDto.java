@@ -1,4 +1,4 @@
 package com.exchanger.dto;
 
-public record ExchangeRateDto(String baseCurrencyCode, String targetCurrencyCode, Double rate) {
+public record ExchangeRateDto(String baseCurrencyCode, String targetCurrencyCode, double rate) {
 }

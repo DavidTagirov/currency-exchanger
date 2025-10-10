@@ -1,6 +1,8 @@
 package com.exchanger.service;
 
 import com.exchanger.dao.ExchangeRatesDao;
+import com.exchanger.dto.ExchangeRequestDto;
+import com.exchanger.dto.ExchangeResponseDto;
 import com.exchanger.dto.ExchangeRateDto;
 import com.exchanger.exception.ExchangeRateNotFoundException;
 import com.exchanger.exception.InvalidCurrenciesPathException;
@@ -18,20 +20,13 @@ public class ExchangeRatesService {
     }
 
     public ExchangeRate getExchangeRate(String baseCurrencyCode, String targetCurrencyCode) {
-        if (baseCurrencyCode == null || baseCurrencyCode.isBlank() ||
-                targetCurrencyCode == null || targetCurrencyCode.isBlank()) {
-            throw new InvalidCurrenciesPathException();
-        }
+        validate(baseCurrencyCode, targetCurrencyCode, new InvalidCurrenciesPathException());
         Optional<ExchangeRate> exchangeRate = exchangeRatesDao.findByCodes(baseCurrencyCode, targetCurrencyCode);
         return exchangeRate.orElseThrow(ExchangeRateNotFoundException::new);
     }
 
     public ExchangeRate setExchangeRate(ExchangeRateDto exchangeRateDto) {
-        if (exchangeRateDto.baseCurrencyCode() == null || exchangeRateDto.baseCurrencyCode().isBlank() ||
-                exchangeRateDto.targetCurrencyCode() == null || exchangeRateDto.targetCurrencyCode().isBlank() ||
-                exchangeRateDto.rate() == null) {
-            throw new MissingRequestParameterException();
-        }
+        validate(exchangeRateDto.baseCurrencyCode(), exchangeRateDto.targetCurrencyCode(), new MissingRequestParameterException());
         exchangeRatesDao.save(exchangeRateDto);
         Optional<ExchangeRate> exchangeRate = exchangeRatesDao.findByCodes(
                 exchangeRateDto.baseCurrencyCode(),
@@ -41,11 +36,7 @@ public class ExchangeRatesService {
     }
 
     public ExchangeRate uploadExchangeRate(ExchangeRateDto exchangeRateDto) {
-        if (exchangeRateDto.baseCurrencyCode() == null || exchangeRateDto.baseCurrencyCode().isBlank() ||
-                exchangeRateDto.targetCurrencyCode() == null || exchangeRateDto.targetCurrencyCode().isBlank() ||
-                exchangeRateDto.rate() == null) {
-            throw new MissingRequestParameterException();
-        }
+        validate(exchangeRateDto.baseCurrencyCode(), exchangeRateDto.targetCurrencyCode(), new MissingRequestParameterException());
         exchangeRatesDao.updateExchangeRate(exchangeRateDto);
         Optional<ExchangeRate> exchangeRate = exchangeRatesDao.findByCodes(
                 exchangeRateDto.baseCurrencyCode(),
@@ -53,5 +44,31 @@ public class ExchangeRatesService {
         );
         return exchangeRate.orElseThrow(ExchangeRateNotFoundException::new);
 
+    }
+
+    public ExchangeResponseDto exchange(ExchangeRequestDto exchangeRequestDto) {
+        validate(exchangeRequestDto.fromCurrencyCode(), exchangeRequestDto.toCurrencyCode(), new MissingRequestParameterException());
+        double rate = exchangeRatesDao.findRate(
+                exchangeRequestDto.fromCurrencyCode(),
+                exchangeRequestDto.toCurrencyCode()
+        );
+        double convertedAmount = rate * exchangeRequestDto.amount();
+        Optional<ExchangeRate> exchangeRate = exchangeRatesDao.findByCodes(
+                exchangeRequestDto.fromCurrencyCode(),
+                exchangeRequestDto.toCurrencyCode()
+        );
+        return new ExchangeResponseDto(
+                exchangeRate.orElseThrow(ExchangeRateNotFoundException::new),
+                rate,
+                exchangeRequestDto.amount(),
+                convertedAmount
+        );
+    }
+
+    private void validate(String baseCurrencyCode, String targetCurrencyCode, RuntimeException exception) {
+        if (baseCurrencyCode == null || baseCurrencyCode.isBlank() ||
+                targetCurrencyCode == null || targetCurrencyCode.isBlank()) {
+            throw exception;
+        }
     }
 }

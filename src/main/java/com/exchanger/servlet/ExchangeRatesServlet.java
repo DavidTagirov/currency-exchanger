@@ -6,7 +6,6 @@ import com.exchanger.model.ExchangeRate;
 import com.exchanger.service.ExchangeRatesService;
 import com.google.gson.Gson;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +38,7 @@ public class ExchangeRatesServlet extends HttpServlet {
         try {
             String baseCurrencyCode = request.getParameter("baseCurrencyCode");
             String targetCurrencyCode = request.getParameter("targetCurrencyCode");
-            Double rate = Double.parseDouble(request.getParameter("rate"));
+            double rate = Double.parseDouble(request.getParameter("rate"));
             ExchangeRateDto exchangeRateDto = new ExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
             ExchangeRate exchangeRate = exchangeRatesService.setExchangeRate(exchangeRateDto);
             response.getWriter().write(new Gson().toJson(exchangeRate));

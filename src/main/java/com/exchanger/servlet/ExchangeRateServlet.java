@@ -39,7 +39,7 @@ public class ExchangeRateServlet extends HttpServlet {
         try {
             String baseCurrencyCode = request.getPathInfo().substring(0, 3);
             String targetCurrencyCode = request.getPathInfo().substring(3);
-            Double rate = Double.valueOf(request.getParameter("rate"));
+            double rate = Double.parseDouble(request.getParameter("rate"));
             ExchangeRateDto exchangeRateDto = new ExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
             ExchangeRate exchangeRate = exchangeRatesService.uploadExchangeRate(exchangeRateDto);
             response.getWriter().write(new Gson().toJson(exchangeRate));
